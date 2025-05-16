@@ -18,7 +18,7 @@ class Nav2GoalClient(Node):
         self.poses = []
         self.current_goal_index = 0
         self.total_goals = 0
-        logging.basicConfig(filename='dwb_controller_log_case2.txt',
+        logging.basicConfig(filename='mppi_log_case2.txt',
             filemode='a',
             format='%(asctime)s %(levelname)s %(message)s',
             level=logging.INFO
@@ -95,7 +95,8 @@ class Nav2GoalClient(Node):
 def main(args=None):
     rclpy.init(args=args)
     client = Nav2GoalClient()
-    poses = [(8.0, -8.0), (0.0511, -0.0342)]
+    #poses = [(8.0, -8.0), (0.0511, -0.0342)]
+    poses = [(5.21, 5.16), (0.0108, -0.00972)] 
     client.poses = poses
     client.current_goal_index = 0
     target_x, target_y = client.poses[client.current_goal_index]
