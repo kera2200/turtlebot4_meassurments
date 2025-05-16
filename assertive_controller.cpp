@@ -34,24 +34,6 @@ void AssertiveController::setPlan(const nav_msgs::msg::Path & path)
 {
    
 
-    static geometry_msgs::msg::PoseStamped last_goal;  // Track the last goal
-    static bool plan_set = false;  // Flag to track if a plan has already been set
-
-    if (!path.poses.empty()) {
-        const auto & new_goal = path.poses.back();  // The last pose in the path is the goal
-
-        // Check if the goal has changed
-        if (last_goal.pose.position.x != new_goal.pose.position.x ||
-            last_goal.pose.position.y != new_goal.pose.position.y ||
-            last_goal.pose.orientation.z != new_goal.pose.orientation.z ||
-            last_goal.pose.orientation.w != new_goal.pose.orientation.w) {
-            RCLCPP_INFO(logger_, "New goal detected. Resetting plan.");
-            plan_set = false;  // Reset the plan flag
-            last_goal = new_goal;  // Update the last goal
-        }
-    }
-
-
     if (path.poses.empty()) {
         RCLCPP_WARN(logger_, "Received an empty path. Ignoring.");
         return;
@@ -59,8 +41,6 @@ void AssertiveController::setPlan(const nav_msgs::msg::Path & path)
 
     RCLCPP_INFO(logger_, "Setting path in AssertiveController with %lu poses", path.poses.size());
     plan_ = path;
-    plan_set = true;  // Mark the plan as set
-
     const auto & start = path.poses.front().pose.position;
     const auto & goal = path.poses.back().pose.position;
     movement_angle_ = std::atan2(goal.y - start.y, goal.x - start.x);
@@ -149,13 +129,6 @@ geometry_msgs::msg::TwistStamped AssertiveController::computeVelocityCommands(
     return cmd_vel;
   }
 
-  // Stop if goal is behind movement angle
-  if (std::cos(angle_diff) < 0.0) {
-    cmd_vel.twist.linear.x = 0.0;
-    cmd_vel.twist.angular.z = 0.0;
-    RCLCPP_INFO(node_->get_logger(), "Target direction is behind us. Holding.");
-    return cmd_vel;
-  }
 
   // Drive forward
   double forward_speed = std::clamp(max_forward_speed * std::cos(angle_diff), 0.0, max_forward_speed);
