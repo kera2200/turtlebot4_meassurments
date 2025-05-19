@@ -13,6 +13,7 @@ class Nav2GoalClient(Node):
     def __init__(self):
         super().__init__('nav2_goal_client')
         self._client = ActionClient(self, NavigateToPose, 'navigate_to_pose')
+        self.max_goals = 6
         self.nav_time = 0.0
         self.recoveries = 0       
         self.poses = []
@@ -79,7 +80,7 @@ class Nav2GoalClient(Node):
         self.total_goals += 1
         self.get_logger().info(f"Finished goals: {self.total_goals}")
         self.logger.info(f"Finished goals: {self.total_goals}")
-        if self.total_goals == 6: #Stopping after x amount of goals
+        if self.total_goals == self.max_goals: #Stopping after x amount of goals
             self.get_logger().info("All goals completed.")
             rclpy.shutdown()
             return
