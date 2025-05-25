@@ -76,11 +76,7 @@ geometry_msgs::msg::TwistStamped AssertiveController::computeVelocityCommands(
     return cmd_vel;
   }
 
-  // Target direction
-  const auto & target_pose = plan_.poses.front().pose;
-  double dx = target_pose.position.x - current_pose.pose.position.x;
-  double dy = target_pose.position.y - current_pose.pose.position.y;
-  double dist = std::hypot(dx, dy);
+ 
 
   double current_angle = tf2::getYaw(current_pose.pose.orientation);
   // Obstacle check
@@ -108,12 +104,12 @@ geometry_msgs::msg::TwistStamped AssertiveController::computeVelocityCommands(
 
 
   // Angle calculations
-  
   double angle_diff = std::atan2(std::sin(movement_angle_ - current_angle),
                                  std::cos(movement_angle_ - current_angle));
 
-  RCLCPP_INFO(node_->get_logger(), "dx: %.4f, dy: %.4f, dist: %.4f, movement_angle: %.4f, current_angle: %.4f, angle_diff: %.4f",
-              dx, dy, dist, movement_angle_, current_angle, angle_diff);
+  RCLCPP_INFO(node_->get_logger(), "movement_angle: %.4f, current_angle: %.4f, angle_diff: %.4f",
+              movement_angle_, current_angle, angle_diff);
+
 
   // Parameters
   const double angular_speed_gain = 1.5;
